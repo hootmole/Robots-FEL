@@ -5,10 +5,10 @@ import time, machine
 from lib.robot_consts import Button, Port, Sensor, Light
 
 # TODO Change these constants
-REGULATION_PERIOD_MS = 10       # Regulation period 0.010 s <=> 100 Hz
-MOTOR_BASE_POWER = 90           # 0-100 %
+dt = 0.01      # Regulation period 0.010 s <=> 100 Hz
+MOTOR_BASE_POWER = 50           # 0-100 %
 LIGHT_SETPOINT = 21             # 
-Kp, Ki, Kd = 0.4, 10, 0.1            # PID constants
+Kp, Ki, Kd = 5, 0, 0            # PID constants
 
 
 # If the program is run from the menu, access global robot variable
@@ -29,7 +29,7 @@ robot.init_motor(Port.M2)	#right motor
 # Initialize Open-Cube RGB sensor on port S1
 robot.init_sensor(sensor_type=Sensor.OC_COLOR, port=Port.S1)
 # Initialize Open-Cube Touch Sensor on port S2
-robot.init sensor(sensor type=Sensor.NXT TOUCH,port=Port.S2)
+robot.init_sensor(sensor_type=Sensor.NXT_TOUCH,port=Port.S2)
 # Regulator variables
 error = 0
 last_error, integral, derivative = 0, 0, 0
@@ -39,14 +39,11 @@ output, motor_pwr = 0, 0
 #output_max = 100
 #integral_min = -10
 #integral_max = 80
-dt = 0.01
 
 
-#while not robot.sensors.touch[Port.S2].pressed():
-#    time.sleep_ms(300)
 
 
-#while not robot.sensors.touch[Port]:
+#while not robot.sensors.touch[Port.S2]:
 #    time.sleep(0.1)
 time.sleep_ms(2000)
 
@@ -83,14 +80,14 @@ while True:
     
 
 
-    # Set motor power
+    # output /= 2.0 # divide the output between 2 motors
+    motor_power = MOTOR_BASE_POWER - output
     robot.motors[Port.M1].set_power(MOTOR_BASE_POWER + output)
     robot.motors[Port.M2].set_power(MOTOR_BASE_POWER - output)
 
-    # Do nothing
-    time.sleep_ms(REGULATION_PERIOD_MS)
-    print("ss")
-    # Exit program if left cube button is pressed
+
+
+    time.sleep_ms(dt * 1000)
     buttons = robot.buttons.pressed()
     if buttons[Button.LEFT]:
         break
