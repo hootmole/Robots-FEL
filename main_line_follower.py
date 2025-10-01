@@ -22,7 +22,6 @@ except :
     independent_run = True
     
 
-# Initialize motors on ports M2 and M3
 robot.init_motor(Port.M1)   #left motor
 robot.init_motor(Port.M2)	#right motor
 
@@ -35,63 +34,43 @@ error = 0
 last_error, integral, derivative = 0, 0, 0
 output, motor_pwr = 0, 0
 
-#output_min = -100
-#output_max = 100
-#integral_min = -10
-#integral_max = 80
-
-
-
 
 #while not robot.sensors.touch[Port.S2]:
 #    time.sleep(0.1)
 time.sleep_ms(2000)
 
     
-# Follower regulation loop
 while True:
-    # Read light intensity
     light_intensity = robot.sensors.light[Port.S1].reflection() 
-
-    # TODO - PID regulator
-    # 1. calculate error value e from light setpoint and measured ligth intensity
-    # e =
-
-    # 2. calculate motor_pwr using error variables (e, e_sum, e_prev) and PID constants (Kp, Ki, Kd)
-    # motor_pwr = 
-
-    # 3. save previous error for the derivative part
-    # e_prev = 
-
-    # 4. Save sum of errors for the integral part
-    # e_sum =
     
     error = LIGHT_SETPOINT - light_intensity
+    
     integral = integral +  error * dt
-    #if(integral > integral_max):integral = integral_max
-    #if(integral < integral_min):integral = integral_min
     derivative = (error - last_error) / dt
+    
     output = Kp * error + Ki * integral + Kd * derivative
+    
     last_error = error
-    
-    #if (output < output_min): output = output_min
-    #if (output > output_max): output = output_max
-    
-    
-
+        
 
     # output /= 2.0 # divide the output between 2 motors
-    motor_power = MOTOR_BASE_POWER - output
+    motor_power = MOTOR_BASE_POWER# - abs(output)
     robot.motors[Port.M1].set_power(MOTOR_BASE_POWER + output)
     robot.motors[Port.M2].set_power(MOTOR_BASE_POWER - output)
-
 
 
     time.sleep_ms(dt * 1000)
     buttons = robot.buttons.pressed()
     if buttons[Button.LEFT]:
         break
-    
+
+
 # Reset back to menu
 if independent_run:
     machine.reset()
+    
+    
+    
+    
+    
+    
