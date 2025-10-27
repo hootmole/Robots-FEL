@@ -36,6 +36,7 @@ motor_power = 0
 dt = 0.01
 
 phase = 1
+first_encounter = 1
 
 while True:
     # Read light intensity
@@ -51,12 +52,18 @@ while True:
         robot.motors[Port.M1].set_power(100)
         robot.motors[Port.M2].set_power(100)
         
-        phase = -1
+        if first_encounter:
+            first_encounter = 0
+            if phase == 1:
+                phase = -1
+            else:
+                phase = 1
+        
     else:
-        phase = 1
+        first_encounter = 1
         
         
-    if light_intensity < 30 and False:
+    if light_intensity < 30:
         robot.motors[Port.M1].set_power(-MOTOR_BASE_POWER)
         robot.motors[Port.M2].set_power(-MOTOR_BASE_POWER)
         time.sleep(1)
